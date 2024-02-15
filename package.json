@@ -1,9 +1,10 @@
 {
-  "name": "@minimal/material-kit-react",
-  "author": "minimals.cc",
+  "name": "marketing-analitical-platform",
+  "author": "Andrii Petryk",
   "licence": "MIT",
   "version": "1.8.0",
   "private": false,
+  "proxy": "https://localhost:3000",
   "scripts": {
     "dev": "vite",
     "start": "vite preview",
@@ -68,5 +69,8 @@
     "typescript": "^5.2.2",
     "vite": "^5.1.0",
     "vite-plugin-checker": "^0.6.2"
+  },
+  "engines": {
+    "node": "20.x"
   }
 }
