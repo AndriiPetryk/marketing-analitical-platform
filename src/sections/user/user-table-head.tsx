@@ -1,8 +1,7 @@
-import PropTypes from 'prop-types';
+import {FC} from 'react';
 
 import Box from '@mui/material/Box';
 import TableRow from '@mui/material/TableRow';
-import Checkbox from '@mui/material/Checkbox';
 import TableHead from '@mui/material/TableHead';
 import TableCell from '@mui/material/TableCell';
 import TableSortLabel from '@mui/material/TableSortLabel';
@@ -10,16 +9,21 @@ import TableSortLabel from '@mui/material/TableSortLabel';
 import { visuallyHidden } from './utils';
 
 // ----------------------------------------------------------------------
-
-export default function UserTableHead({
+interface UserTableHead {
+  order: string,
+  orderBy: string,
+  rowCount: number,
+  headLabel: Array<any>,
+  numSelected: number,
+  onRequestSort: (event, property) => {},
+  onSelectAllClick: () => {},
+}
+const UserTableHead: FC<UserTableHead> = ({
   order,
   orderBy,
-  rowCount,
   headLabel,
-  numSelected,
   onRequestSort,
-  onSelectAllClick,
-}) {
+}) => {
   const onSort = (property) => (event) => {
     onRequestSort(event, property);
   };
@@ -27,14 +31,6 @@ export default function UserTableHead({
   return (
     <TableHead>
       <TableRow>
-        <TableCell padding="checkbox">
-          <Checkbox
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
-            onChange={onSelectAllClick}
-          />
-        </TableCell>
-
         {headLabel.map((headCell) => (
           <TableCell
             key={headCell.id}
@@ -62,12 +58,4 @@ export default function UserTableHead({
   );
 }
 
-UserTableHead.propTypes = {
-  order: PropTypes.oneOf(['asc', 'desc']),
-  orderBy: PropTypes.string,
-  rowCount: PropTypes.number,
-  headLabel: PropTypes.array,
-  numSelected: PropTypes.number,
-  onRequestSort: PropTypes.func,
-  onSelectAllClick: PropTypes.func,
-};
+export default UserTableHead;

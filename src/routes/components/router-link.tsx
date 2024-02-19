@@ -1,13 +1,13 @@
-import PropTypes from 'prop-types';
-import { forwardRef } from 'react';
-import { Link } from 'react-router-dom';
+import {FC} from 'react';
+import {forwardRef} from 'react';
+import {Link} from 'react-router-dom';
 
 // ----------------------------------------------------------------------
+interface RouterLink {
+    href: string
+}
 
-const RouterLink = forwardRef(({ href, ...other }, ref) => <Link ref={ref} to={href} {...other} />);
-
-RouterLink.propTypes = {
-  href: PropTypes.string,
-};
+// @ts-ignore
+const RouterLink: FC<RouterLink> = forwardRef(({href, ...other}, ref) => <Link ref={ref} to={href} {...other} />);
 
 export default RouterLink;

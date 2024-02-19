@@ -1,7 +1,7 @@
 import {useState, useEffect} from 'react';
-import {Link, useLocation, useNavigate} from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
-import {useLoginMutation} from '../../slices/usersApiSlice';
+import {useRegisterMutation} from '../../slices/usersApiSlice';
 import {setCredentials} from '../../slices/authSlice';
 import {toast} from 'react-toastify';
 
@@ -23,19 +23,21 @@ import CircularIndeterminate from "../../components/progress/progress.tsx";
 
 // ----------------------------------------------------------------------
 
-export default function LoginView() {
+export default function SignupView() {
+    const [username, setUserName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [passwordConfirm, setPasswordConfirm] = useState('');
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const [login, {isLoading}] = useLoginMutation();
+    const [register, {isLoading}] = useRegisterMutation();
     // @ts-ignore
     const {userInfo} = useSelector((state) => state?.auth);
 
     const {search} = useLocation();
     const sp = new URLSearchParams(search);
-    const redirect = sp.get('redirect') || '/signup';
+    const redirect = sp.get('redirect') || '/';
 
     useEffect(() => {
         if (userInfo) {
@@ -48,14 +50,20 @@ export default function LoginView() {
     const router = useRouter();
 
     const [showPassword, setShowPassword] = useState(false);
+
     const submitHandler = async (e) => {
         e.preventDefault();
-        try {
-            const res = await login({email, password}).unwrap();
-            dispatch(setCredentials({...res}));
-            router.push('/dashboard');
-        } catch (err) {
-            toast.error(err?.data?.message || err.error);
+
+        if (password !== passwordConfirm) {
+            toast.error('Passwords do not match');
+        } else {
+            try {
+                const res = await register({username, email, password, passwordConfirm}).unwrap();
+                dispatch(setCredentials({...res}));
+                router.push('/dashboard');
+            } catch (err) {
+                toast.error(err?.data?.message || err.error);
+            }
         }
     };
 
@@ -66,6 +74,12 @@ export default function LoginView() {
     const renderForm = (
         <>
             <Stack spacing={3}>
+                <TextField
+                    name="username"
+                    label="Username"
+                    value={username}
+                    onChange={(e) => setUserName(e.target.value)}
+                />
                 <TextField
                     name="email"
                     label="Email address"
@@ -89,6 +103,22 @@ export default function LoginView() {
                         ),
                     }}
                 />
+                <TextField
+                    name="passwordConfirm"
+                    label="Confirm Password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={passwordConfirm}
+                    onChange={(e) => setPasswordConfirm(e.target.value)}
+                    InputProps={{
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                                    <Iconify icon={showPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'}/>
+                                </IconButton>
+                            </InputAdornment>
+                        ),
+                    }}
+                />
             </Stack>
 
             <LoadingButton
@@ -99,7 +129,7 @@ export default function LoginView() {
                 color="inherit"
                 onClick={submitHandler}
             >
-                Login
+                Signup
             </LoadingButton>
         </>
     );
@@ -130,14 +160,7 @@ export default function LoginView() {
                         maxWidth: 420,
                     }}
                 >
-                    <Typography variant="h4">Sign in to Dashboard</Typography>
-
-                    <Typography variant="body2" sx={{mt: 2, mb: 5}}>
-                        Don’t have an account?
-                        <Link to='/signup'>
-                            Get started
-                        </Link>
-                    </Typography>
+                    <Typography variant="h4">Signup in to Dashboard</Typography>
 
                     {renderForm}
                 </Card>
