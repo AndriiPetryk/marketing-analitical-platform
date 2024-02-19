@@ -21,15 +21,15 @@ export default function AppView() {
     // const {userInfo: {user: {_id: userId}}} = useSelector((state) => state?.auth);
     const {userInfo} = useSelector((state) => state?.auth);
 
-    console.log('userInfo', userInfo);
+    // console.log('userInfo', userInfo);
 
     // const {data: userDetailedData, isLoading, error} = useGetUsersQuery();
     // const {data: userDetailedData, isLoading, error} = useGetUsersQuery(userId);
 
     const userDetailedData = data?.users?.data[0];
 
-    console.log('data', data);
-    console.log('userDetailedData', userDetailedData);
+    // console.log('data', data);
+    // console.log('userDetailedData', userDetailedData);
 
     // const membersCities = userDetailedData?.data[0].statId[0].membersCities;
     // const usersCount = userDetailedData?.data[0].statId[0].usersCount;
@@ -48,7 +48,7 @@ export default function AppView() {
     const newObj = {};
 
     userDetailedData?.weeklyActivityId.forEach(item => {
-    // userDetailedData?.data[0]?.weeklyActivityId.forEach(item => {
+        // userDetailedData?.data[0]?.weeklyActivityId.forEach(item => {
         for (let key in item) {
             if (key === 'likes' || key === 'comments' || key === 'interactions') {
                 newObj[key] = [];
@@ -97,8 +97,6 @@ export default function AppView() {
     if (isLoading) {
         return <CircularIndeterminate/>
     }
-
-    console.log('series', series);
 
     return (
         <Container maxWidth='xl'>
