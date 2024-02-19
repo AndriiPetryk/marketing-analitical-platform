@@ -4,7 +4,6 @@
   "licence": "MIT",
   "version": "1.8.0",
   "private": false,
-  "proxy": "https://localhost:3000",
   "scripts": {
     "dev": "vite",
     "start": "vite preview",

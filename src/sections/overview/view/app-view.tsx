@@ -3,28 +3,52 @@ import Grid from '@mui/material/Unstable_Grid2';
 import AppCurrentVisits from '../app-current-visits';
 import AppWebsiteVisits from '../app-website-visits';
 import AppWidgetSummary from '../app-widget-summary';
-import {useGetUsersQuery} from '../../../slices/usersSlice'
+// import {useGetUsersQuery} from '../../../slices/usersSlice'
 import {useSelector} from "react-redux";
-import CircularIndeterminate from "../../../components/progress/progress.tsx";
+import CircularIndeterminate from "../../../components/progress/progress";
+import AppCurrentSubject from '../app-current-subject';
+import AppConversionRates from '../app-conversion-rates';
 import {toast} from "react-toastify";
+import data from '../../../../db.json';
 
 // ----------------------------------------------------------------------
 
 export default function AppView() {
 
+    const error = false;
+    const isLoading = false;
     // @ts-ignore
-    const {userInfo: {user: {_id: userId}}} = useSelector((state) => state?.auth);
+    // const {userInfo: {user: {_id: userId}}} = useSelector((state) => state?.auth);
+    const {userInfo} = useSelector((state) => state?.auth);
 
-    const {data: userDetailedData, isLoading, error} = useGetUsersQuery(userId);
+    console.log('userInfo', userInfo);
 
-    const usersCount = userDetailedData?.data[0].statId[0].usersCount;
-    const avgLikes = userDetailedData?.data[0].statId[0].avgLikes;
-    const avgComments = userDetailedData?.data[0].statId[0].avgComments;
-    const avgInteractions = userDetailedData?.data[0].statId[0].avgInteractions;
+    // const {data: userDetailedData, isLoading, error} = useGetUsersQuery();
+    // const {data: userDetailedData, isLoading, error} = useGetUsersQuery(userId);
+
+    const userDetailedData = data?.users?.data[0];
+
+    console.log('data', data);
+    console.log('userDetailedData', userDetailedData);
+
+    // const membersCities = userDetailedData?.data[0].statId[0].membersCities;
+    // const usersCount = userDetailedData?.data[0].statId[0].usersCount;
+    // const avgLikes = userDetailedData?.data[0].statId[0].avgLikes;
+    // const avgComments = userDetailedData?.data[0].statId[0].avgComments;
+    // const avgInteractions = userDetailedData?.data[0].statId[0].avgInteractions;
+
+    const membersCities = userDetailedData?.statId[0].membersCities;
+    const usersCount = userDetailedData?.statId[0].usersCount;
+    const avgLikes = userDetailedData?.statId[0].avgLikes;
+    const avgComments = userDetailedData?.statId[0].avgComments;
+    const avgInteractions = userDetailedData?.statId[0].avgInteractions;
+
+    const seriesDataForCities = membersCities?.map(({name, value}) => ({label: name, value: value}));
 
     const newObj = {};
 
-    userDetailedData?.data[0]?.weeklyActivityId.forEach(item => {
+    userDetailedData?.weeklyActivityId.forEach(item => {
+    // userDetailedData?.data[0]?.weeklyActivityId.forEach(item => {
         for (let key in item) {
             if (key === 'likes' || key === 'comments' || key === 'interactions') {
                 newObj[key] = [];
@@ -33,9 +57,9 @@ export default function AppView() {
     });
 
 // Push values into corresponding arrays
-    userDetailedData?.data[0]?.weeklyActivityId.forEach(item => {
+//     userDetailedData?.data[0]?.weeklyActivityId.forEach(item => {
+    userDetailedData?.weeklyActivityId.forEach(item => {
         for (let key in item) {
-            // console.log('key', key);
             if (key === 'likes' || key === 'comments' || key === 'interactions') {
                 newObj[key].push(Math.round(item[key]));
             }
@@ -51,7 +75,8 @@ export default function AppView() {
         comments: 0,
     };
 
-    userDetailedData?.data[0]?.weeklyActivityId.forEach(item => {
+    // userDetailedData?.data[0]?.weeklyActivityId.forEach(item => {
+    userDetailedData?.weeklyActivityId.forEach(item => {
         // Iterate over the keys of each object
         for (let key in item) {
             if (key === 'likes' || key === 'comments' || key === 'interactions') { // Exclude the 'time' key
@@ -66,12 +91,14 @@ export default function AppView() {
 
     if (error) {
         // @ts-ignore
-        toast.error(error);
+        return toast.error(error);
     }
 
     if (isLoading) {
         return <CircularIndeterminate/>
     }
+
+    console.log('series', series);
 
     return (
         <Container maxWidth='xl'>
@@ -159,6 +186,29 @@ export default function AppView() {
                         title='Current Activity'
                         chart={{
                             series,
+                        }}
+                    />
+                </Grid>
+
+                <Grid xs={12} md={6} lg={8}>
+                    <AppConversionRates
+                        title="Conversion Rates"
+                        chart={{
+                            series: seriesDataForCities,
+                        }}
+                    />
+                </Grid>
+
+                <Grid xs={12} md={6} lg={4}>
+                    <AppCurrentSubject
+                        title="Current Subject"
+                        chart={{
+                            categories: ['Interactions', 'Likes', 'Comments'],
+                            series: [
+                                {name: 'Interactions', data: newObj?.interactions},
+                                {name: 'Likes', data: newObj?.likes},
+                                {name: 'Comments', data: newObj?.comments},
+                            ],
                         }}
                     />
                 </Grid>
